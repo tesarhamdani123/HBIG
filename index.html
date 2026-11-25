@@ -145,7 +145,7 @@
     id="app-frame"
     src="https://script.google.com/macros/s/AKfycbx9d2shQPZF7WrJ_S8zePOckbGlH4zU30zWmszwhR81DrYzEYnkouenkusHa9_LBldbPw/exec"
     title="Google Apps Script Web App"
-    allow="camera; microphone; geolocation; clipboard-read; clipboard-write"
+    allow="camera; microphone; geolocation; clipboard-read; clipboard-write; downloads"
     allowfullscreen
     referrerpolicy="no-referrer-when-downgrade"
   ></iframe>
@@ -185,6 +185,20 @@
 
       let loadTimer = null;
       let hasLoaded = false;
+
+      // Menerima kiriman file Base64/Blob dari dalam iframe dan meneruskannya ke Android WebView
+      window.addEventListener("message", function (event) {
+        const data = event.data;
+        if (!data || typeof data !== "object") return;
+
+        if (data.type === "HBIG_DOWNLOAD_BASE64" && window.AndroidDownloader && window.AndroidDownloader.saveBase64File) {
+          window.AndroidDownloader.saveBase64File(
+            data.base64Data || "",
+            data.fileName || ("Rekap_HBIG_" + Date.now() + ".xlsx"),
+            data.mimeType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          );
+        }
+      });
 
       function hideLoading() {
         loading.classList.add("hidden");

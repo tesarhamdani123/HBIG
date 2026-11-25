@@ -1,254 +1,82 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0,
-          maximum-scale=1.0, user-scalable=no">
-
-    <meta name="theme-color" content="#0755BD">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <title>Pemantauan HBIG</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #f1f5ff;
-            font-family: Arial, sans-serif;
-        }
-
-        #app {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-            background: white;
-        }
-
-        /* Loading Screen */
-        #loading {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(
-                160deg,
-                #0755bd,
-                #0879ed
-            );
-            color: white;
-            transition: opacity .3s ease;
-        }
-
-        .logo {
-            width: 85px;
-            height: 85px;
-            border-radius: 22px;
-            background: white;
-            color: #0755bd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 35px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px #003b8a66;
-        }
-
-        #loading h2 {
-            font-size: 21px;
-            margin-bottom: 8px;
-        }
-
-        #loading p {
-            font-size: 13px;
-            opacity: .85;
-        }
-
-        .spinner {
-            width: 38px;
-            height: 38px;
-            border: 4px solid #ffffff55;
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin .8s linear infinite;
-            margin-top: 25px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Error Screen */
-        #error {
-            display: none;
-            position: absolute;
-            inset: 0;
-            z-index: 20;
-            background: #f1f5ff;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 30px;
-            text-align: center;
-        }
-
-        #error h3 {
-            color: #0755bd;
-            margin-bottom: 12px;
-        }
-
-        #error p {
-            color: #555;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background: #0755bd;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 28px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .link {
-            margin-top: 15px;
-            color: #0755bd;
-            font-size: 13px;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Index — Data Penerima HBIG & Pemantauan Bayi</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0b4a99, #1565c0 60%, #1ca664);
+      padding: 20px;
+      color: #1e293b;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 520px;
+      width: 100%;
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.18);
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #0b4a99;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 22px; color: #0f294a; margin-bottom: 8px; }
+    p { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 20px; }
+    .btn {
+      display: inline-block;
+      width: 100%;
+      text-decoration: none;
+      background: #0b4a99;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 13px 18px;
+      border-radius: 12px;
+      transition: background 0.2s;
+      margin-bottom: 12px;
+    }
+    .btn:hover { background: #083773; }
+    .meta {
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <div class="badge">GitHub Repository Index</div>
+    <h1>Data Penerima HBIG & Pemantauan Bayi</h1>
+    <p>Portal indeks repositori untuk aplikasi web berbasis Google Apps Script, Google Spreadsheet, dan Google Drive.</p>
 
-<div id="app">
+    <a class="btn" href="https://script.google.com/macros/s/AKfycbwcciv6WjTzvObi7R83K4YHcsODq5l9bUefurmz13MPDlG2NVdE-vgPgxGZtOWSJgYB/exec" target="_blank" rel="noopener noreferrer">
+      Buka Aplikasi Web (/exec)
+    </a>
 
-    <!-- Loading -->
-    <div id="loading">
-        <div class="logo">H</div>
-
-        <h2>Pemantauan HBIG</h2>
-
-        <p>Sehat Bersama, Peduli Sesama</p>
-
-        <div class="spinner"></div>
-
-        <p style="margin-top:15px">
-            Memuat aplikasi...
-        </p>
+    <div class="meta">
+      <div><strong>Endpoint Web App:</strong> https://script.google.com/macros/s/AKfycbwcciv6WjTzvObi7R83K4YHcsODq5l9bUefurmz13MPDlG2NVdE-vgPgxGZtOWSJgYB/exec</div>
+      <div><strong>Arsitektur:</strong> Google Apps Script • Google Spreadsheet • Google Drive</div>
     </div>
-
-    <!-- Aplikasi Google Apps Script -->
-    <iframe
-        id="webapp"
-        src=""
-        allow="camera; microphone; geolocation; clipboard-read; clipboard-write"
-        allowfullscreen>
-    </iframe>
-
-    <!-- Error -->
-    <div id="error">
-        <h3>Koneksi Bermasalah</h3>
-
-        <p>
-            Aplikasi tidak dapat dimuat.
-            Periksa koneksi internet Anda,
-            kemudian coba kembali.
-        </p>
-
-        <button class="btn" onclick="reloadApp()">
-            Muat Ulang Aplikasi
-        </button>
-
-        <a class="link"
-           href="https://script.google.com/macros/s/AKfycbwRChX42maz8fDIutT7U_lLL3b2mi49qZ6MprHv6ZIQKxrqHqOn2LcYMwrOSteyDgQL3A/exec"
-           target="_blank">
-            Buka melalui browser
-        </a>
-    </div>
-
-</div>
-
-<script>
-    const iframe = document.getElementById("webapp");
-    const loading = document.getElementById("loading");
-    const error = document.getElementById("error");
-
-    let loadTimeout;
-
-    function hideLoading() {
-        loading.style.display = "none";
-        clearTimeout(loadTimeout);
-    }
-
-    function showError() {
-        loading.style.display = "none";
-        error.style.display = "flex";
-    }
-
-    function reloadApp() {
-        error.style.display = "none";
-        loading.style.display = "flex";
-
-        iframe.src = iframe.src;
-
-        startTimeout();
-    }
-
-    function startTimeout() {
-        clearTimeout(loadTimeout);
-
-        loadTimeout = setTimeout(() => {
-            showError();
-        }, 25000);
-    }
-
-    iframe.addEventListener("load", function() {
-        hideLoading();
-    });
-
-    window.addEventListener("offline", function() {
-        showError();
-    });
-
-    window.addEventListener("online", function() {
-        reloadApp();
-    });
-
-    startTimeout();
-</script>
-
+  </div>
 </body>
 </html>

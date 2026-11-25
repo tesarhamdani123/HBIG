@@ -1,82 +1,239 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index — Data Penerima HBIG & Pemantauan Bayi</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Aplikasi Web</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-    body {
-      min-height: 100vh;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0f172a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #app-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background-color: #ffffff;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: #0f172a;
+      color: #f8fafc;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #0b4a99, #1565c0 60%, #1ca664);
-      padding: 20px;
-      color: #1e293b;
+      gap: 14px;
+      z-index: 20;
+      transition: opacity 0.25s ease;
     }
-    .card {
-      background: #ffffff;
-      max-width: 520px;
-      width: 100%;
-      border-radius: 18px;
-      padding: 28px 24px;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.18);
+
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    #fallback-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: #0f172a;
+      color: #f8fafc;
+      z-index: 30;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
       text-align: center;
     }
-    .badge {
-      display: inline-block;
-      background: #eff6ff;
-      color: #0b4a99;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 999px;
-      margin-bottom: 12px;
+
+    #fallback-panel.active {
+      display: flex;
     }
-    h1 { font-size: 22px; color: #0f294a; margin-bottom: 8px; }
-    p { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 20px; }
-    .btn {
-      display: inline-block;
+
+    .fallback-card {
+      max-width: 420px;
       width: 100%;
-      text-decoration: none;
-      background: #0b4a99;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 15px;
-      padding: 13px 18px;
+      background-color: #1e293b;
+      border: 1px solid #334155;
       border-radius: 12px;
-      transition: background 0.2s;
-      margin-bottom: 12px;
+      padding: 24px;
     }
-    .btn:hover { background: #083773; }
-    .meta {
-      text-align: left;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 12px;
-      color: #334155;
-      line-height: 1.7;
-      word-break: break-all;
+
+    .fallback-card h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .fallback-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button, a.btn {
+      appearance: none;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background-color: #38bdf8;
+      color: #0f172a;
+    }
+
+    .btn-secondary {
+      background-color: #334155;
+      color: #f8fafc;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="badge">GitHub Repository Index</div>
-    <h1>Data Penerima HBIG & Pemantauan Bayi</h1>
-    <p>Portal indeks repositori untuk aplikasi web berbasis Google Apps Script, Google Spreadsheet, dan Google Drive.</p>
+  <div id="loading-overlay" aria-live="polite">
+    <div class="spinner"></div>
+    <div class="loading-text">Memuat aplikasi...</div>
+  </div>
 
-    <a class="btn" href="https://script.google.com/macros/s/AKfycbwcciv6WjTzvObi7R83K4YHcsODq5l9bUefurmz13MPDlG2NVdE-vgPgxGZtOWSJgYB/exec" target="_blank" rel="noopener noreferrer">
-      Buka Aplikasi Web (/exec)
-    </a>
+  <iframe
+    id="app-frame"
+    src="https://script.google.com/macros/s/AKfycbx_BQs6O26XW_ZahFq9cIISc-8vlwKYarkBMF-4E2RcK6SbIcLkOALYzwPgw4zSUNpSJg/exec"
+    title="Google Apps Script Web App"
+    allow="camera; microphone; geolocation; clipboard-read; clipboard-write"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+  ></iframe>
 
-    <div class="meta">
-      <div><strong>Endpoint Web App:</strong> https://script.google.com/macros/s/AKfycbwcciv6WjTzvObi7R83K4YHcsODq5l9bUefurmz13MPDlG2NVdE-vgPgxGZtOWSJgYB/exec</div>
-      <div><strong>Arsitektur:</strong> Google Apps Script • Google Spreadsheet • Google Drive</div>
+  <div id="fallback-panel" role="alert">
+    <div class="fallback-card">
+      <h2>Aplikasi tidak dapat dimuat di frame</h2>
+      <p>
+        Hal ini biasanya terjadi jika deployment Google Apps Script belum diatur ke <strong>Anyone</strong>,
+        sedang meminta login akun Google yang diblokir iframe, atau koneksi terputus.
+      </p>
+      <div class="btn-group">
+        <button type="button" class="btn-primary" id="retry-btn">Muat Ulang</button>
+        <a
+          class="btn btn-secondary"
+          id="direct-link"
+          href="https://script.google.com/macros/s/AKfycbx_BQs6O26XW_ZahFq9cIISc-8vlwKYarkBMF-4E2RcK6SbIcLkOALYzwPgw4zSUNpSJg/exec"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Buka Langsung
+        </a>
+      </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_BQs6O26XW_ZahFq9cIISc-8vlwKYarkBMF-4E2RcK6SbIcLkOALYzwPgw4zSUNpSJg/exec";
+      const frame = document.getElementById("app-frame");
+      const loading = document.getElementById("loading-overlay");
+      const fallback = document.getElementById("fallback-panel");
+      const retryBtn = document.getElementById("retry-btn");
+      const directLink = document.getElementById("direct-link");
+
+      directLink.href = SCRIPT_URL;
+
+      let loadTimer = null;
+      let hasLoaded = false;
+
+      function hideLoading() {
+        loading.classList.add("hidden");
+      }
+
+      function showFallback() {
+        hideLoading();
+        fallback.classList.add("active");
+      }
+
+      function startLoad(url) {
+        hasLoaded = false;
+        fallback.classList.remove("active");
+        loading.classList.remove("hidden");
+
+        clearTimeout(loadTimer);
+        loadTimer = setTimeout(function () {
+          if (!hasLoaded) {
+            showFallback();
+          }
+        }, 12000);
+
+        frame.src = url;
+      }
+
+      frame.addEventListener("load", function () {
+        hasLoaded = true;
+        clearTimeout(loadTimer);
+        hideLoading();
+      });
+
+      frame.addEventListener("error", function () {
+        clearTimeout(loadTimer);
+        showFallback();
+      });
+
+      retryBtn.addEventListener("click", function () {
+        const separator = SCRIPT_URL.indexOf("?") === -1 ? "?" : "&";
+        startLoad(SCRIPT_URL + separator + "_t=" + Date.now());
+      });
+
+      window.addEventListener("online", function () {
+        if (fallback.classList.contains("active")) {
+          retryBtn.click();
+        }
+      });
+
+      startLoad(SCRIPT_URL);
+    })();
+  </script>
 </body>
 </html>

@@ -14,23 +14,35 @@
 
     html, body {
       width: 100%;
+      min-width: 100%;
       height: 100%;
+      min-height: 100vh;
       overflow: hidden;
       background-color: #0284c7;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     #app-frame {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       border: 0;
       display: block;
       background-color: #ffffff;
+      z-index: 1;
     }
 
+    /* Splash Screen penuh dari GitHub */
     #splash-screen {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       z-index: 25;
       background-color: #0284c7;
       display: flex;
@@ -163,8 +175,9 @@
   <script>
     (function () {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2ZUGYl3k-sVsd0r495nvO_O4REpwPNdfu03EgCICll4vwZQT3O0YkoVMSaSwccPSMIw/exec";
-      const MIN_SPLASH_MS = 1500;
-      const MAX_WAIT_MS = 15000;
+      const MIN_SPLASH_MS = 1800;
+      const FORCE_SPLASH_CLOSE_MS = 4000;
+      const MAX_WAIT_MS = 16000;
 
       const frame = document.getElementById("app-frame");
       const splash = document.getElementById("splash-screen");
@@ -176,6 +189,7 @@
 
       let loadTimer = null;
       let minTimer = null;
+      let forceCloseTimer = null;
       let hasLoaded = false;
       let minElapsed = false;
       let splashHidden = false;
@@ -184,6 +198,7 @@
         if (splashHidden) return;
         splashHidden = true;
         clearTimeout(minTimer);
+        clearTimeout(forceCloseTimer);
         splash.classList.add("fade-out");
         setTimeout(function () {
           splash.style.display = "none";
@@ -200,6 +215,11 @@
         minElapsed = true;
         tryHideSplash();
       }, MIN_SPLASH_MS);
+
+      // Batas aman agar tidak pernah mentok di splash jika event load iframe tidak terpicu
+      forceCloseTimer = setTimeout(function () {
+        hideSplash();
+      }, FORCE_SPLASH_CLOSE_MS);
 
       function triggerBrowserDownload(base64Data, fileName, mimeType) {
         const cleanBase64 = base64Data.includes(",")

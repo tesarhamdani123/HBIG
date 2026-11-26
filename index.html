@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f172a" />
   <title>Aplikasi Web</title>
   <style>
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -186,17 +186,19 @@
       let loadTimer = null;
       let hasLoaded = false;
 
-      // Menerima kiriman file Base64/Blob dari dalam iframe dan meneruskannya ke Android WebView
       window.addEventListener("message", function (event) {
         const data = event.data;
         if (!data || typeof data !== "object") return;
 
-        if (data.type === "HBIG_DOWNLOAD_BASE64" && window.AndroidDownloader && window.AndroidDownloader.saveBase64File) {
-          window.AndroidDownloader.saveBase64File(
-            data.base64Data || "",
-            data.fileName || ("Rekap_HBIG_" + Date.now() + ".xlsx"),
-            data.mimeType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          );
+        if (data.type === "HBIG_DOWNLOAD_BASE64") {
+          const fileName = data.fileName || ("Rekap_HBIG_" + Date.now() + ".xlsx");
+          const mimeType = data.mimeType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+          if (window.AndroidDownloader && typeof window.AndroidDownloader.saveBase64File === "function") {
+            window.AndroidDownloader.saveBase64File(data.base64Data || "", fileName, mimeType);
+          } else if (data.downloadUrl) {
+            window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
+          }
         }
       });
 

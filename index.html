@@ -191,13 +191,28 @@
         if (!data || typeof data !== "object") return;
 
         if (data.type === "HBIG_DOWNLOAD_BASE64") {
-          const fileName = data.fileName || ("Rekap_HBIG_" + Date.now() + ".xlsx");
+          const base64Data = data.base64Data || "";
+          const fileName = data.fileName || ("Data_Penerima_HBIG_dan_Pemantauan_" + Date.now() + ".xlsx");
           const mimeType = data.mimeType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
           if (window.AndroidDownloader && typeof window.AndroidDownloader.saveBase64File === "function") {
-            window.AndroidDownloader.saveBase64File(data.base64Data || "", fileName, mimeType);
-          } else if (data.downloadUrl) {
-            window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
+            window.AndroidDownloader.saveBase64File(base64Data, fileName, mimeType);
+          } else if (base64Data) {
+            // Fallback jika dibuka di browser biasa tanpa AndroidDownloader
+            const byteChars = atob(base64Data);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+              byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
           }
         }
       });

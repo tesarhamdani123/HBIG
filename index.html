@@ -145,6 +145,16 @@
       let loadTimer = null;
       let hasLoaded = false;
 
+      function notifyAndroidFrameReady() {
+        try {
+          if (window.AndroidSplash && typeof window.AndroidSplash.onFrameReady === "function") {
+            window.AndroidSplash.onFrameReady();
+          }
+        } catch (err) {
+          // Abaikan jika dibuka di luar WebView Android
+        }
+      }
+
       function triggerBrowserDownload(base64Data, fileName, mimeType) {
         const cleanBase64 = base64Data.includes(",")
           ? base64Data.split(",")[1]
@@ -191,6 +201,7 @@
 
       function showFallback() {
         fallback.classList.add("active");
+        notifyAndroidFrameReady();
       }
 
       function startLoad(url) {
@@ -211,6 +222,7 @@
         if (!frame.src || frame.src === "about:blank") return;
         hasLoaded = true;
         clearTimeout(loadTimer);
+        setTimeout(notifyAndroidFrameReady, 300);
       });
 
       frame.addEventListener("error", function () {

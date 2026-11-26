@@ -16,7 +16,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #ffffff;
+      background-color: #0284c7;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -26,6 +26,30 @@
       border: 0;
       display: block;
       background-color: #ffffff;
+    }
+
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      background-color: #0284c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.35s ease;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     #fallback-panel {
@@ -101,6 +125,10 @@
   </style>
 </head>
 <body>
+  <div id="splash-screen" aria-hidden="true">
+    <img id="splash-img" src="./splash_sibiha.png" alt="Splash Screen SIBIHA" />
+  </div>
+
   <iframe
     id="app-frame"
     src="about:blank"
@@ -135,7 +163,11 @@
   <script>
     (function () {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2ZUGYl3k-sVsd0r495nvO_O4REpwPNdfu03EgCICll4vwZQT3O0YkoVMSaSwccPSMIw/exec";
+      const MIN_SPLASH_MS = 1500;
+      const MAX_WAIT_MS = 15000;
+
       const frame = document.getElementById("app-frame");
+      const splash = document.getElementById("splash-screen");
       const fallback = document.getElementById("fallback-panel");
       const retryBtn = document.getElementById("retry-btn");
       const directLink = document.getElementById("direct-link");
@@ -143,17 +175,31 @@
       directLink.href = SCRIPT_URL;
 
       let loadTimer = null;
+      let minTimer = null;
       let hasLoaded = false;
+      let minElapsed = false;
+      let splashHidden = false;
 
-      function notifyAndroidFrameReady() {
-        try {
-          if (window.AndroidSplash && typeof window.AndroidSplash.onFrameReady === "function") {
-            window.AndroidSplash.onFrameReady();
-          }
-        } catch (err) {
-          // Abaikan jika dibuka di luar WebView Android
+      function hideSplash() {
+        if (splashHidden) return;
+        splashHidden = true;
+        clearTimeout(minTimer);
+        splash.classList.add("fade-out");
+        setTimeout(function () {
+          splash.style.display = "none";
+        }, 380);
+      }
+
+      function tryHideSplash() {
+        if (minElapsed && hasLoaded) {
+          hideSplash();
         }
       }
+
+      minTimer = setTimeout(function () {
+        minElapsed = true;
+        tryHideSplash();
+      }, MIN_SPLASH_MS);
 
       function triggerBrowserDownload(base64Data, fileName, mimeType) {
         const cleanBase64 = base64Data.includes(",")
@@ -185,8 +231,8 @@
         if (!data || typeof data !== "object") return;
 
         if (data.type === "HBIG_DOWNLOAD_BASE64") {
-          const base64Data = data.base64Data || "";
-          const fileName = data.fileName || ("Data_Penerima_HBIG_dan_Pemantauan_" + Date.now() + ".xlsx");
+          const base64Data = typeof data.base64Data === "string" ? data.base64Data.trim() : "";
+          const fileName = data.fileName || "Data_Penerima_HBIG_dan_Pemantauan.xlsx";
           const mimeType = data.mimeType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
           if (!base64Data) return;
@@ -200,8 +246,8 @@
       });
 
       function showFallback() {
+        hideSplash();
         fallback.classList.add("active");
-        notifyAndroidFrameReady();
       }
 
       function startLoad(url) {
@@ -213,7 +259,7 @@
           if (!hasLoaded) {
             showFallback();
           }
-        }, 15000);
+        }, MAX_WAIT_MS);
 
         frame.src = url;
       }
@@ -222,7 +268,7 @@
         if (!frame.src || frame.src === "about:blank") return;
         hasLoaded = true;
         clearTimeout(loadTimer);
-        setTimeout(notifyAndroidFrameReady, 300);
+        tryHideSplash();
       });
 
       frame.addEventListener("error", function () {
